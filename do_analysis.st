@@ -5,8 +5,7 @@
 " Accessions retrieved from https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Wuhan%20seafood%20market%20pneumonia%20virus,%20taxid:2697049 "
 
 " ToDo 1: Try to download accessions from here: https://dev.ncbi.nlm.nih.gov/core/assets/genbank/files/ncov-sequences.yaml (currently restricted access?) "
-" ToDo 2: Add sequences from GISAID "
-" ToDo 3: Test MAFFT alignment "
+" ToDo 2: Add sequences from GISAID? Not available yet "
 
 seqs_from_china := #('NC_045512' 'LR757998' 'LR757997' 'LR757996' 'LR757995' 'MN908947' 'MN975266' 'MN938389' 'MN938388' 'MN975262' 'MN975264' 'MN938385' 'MN938386' 'MN975267' 'MN975268' 'MN938390' 'MN975263' 'MN938387' 'MN975265' 'MN938384' 'MN988669' 'MN988668' 'MN996527' 'MN996528' 'MN996529' 'MN996530' 'MN996531').
 seqs_from_USA := #('MN988713' 'MN997409' 'MN994467' 'MN994468' 'MN985325').
