@@ -8,11 +8,12 @@
 " ToDo 2: Add sequences from GISAID "
 " ToDo 3: Test MAFFT alignment "
 
-seqs_from_china := #('NC_045512' 'MN908947' 'MN975266' 'MN938389' 'MN938388' 'MN975262' 'MN975264' 'MN938385' 'MN938386' 'MN975267' 'MN975268' 'MN938390' 'MN975263' 'MN938387' 'MN975265' 'MN938384' 'MN988669' 'MN988668' 'MN996527' 'MN996528' 'MN996529' 'MN996530' 'MN996531').
+seqs_from_china := #('NC_045512' 'LR757998' 'LR757997' 'LR757996' 'LR757995' 'MN908947' 'MN975266' 'MN938389' 'MN938388' 'MN975262' 'MN975264' 'MN938385' 'MN938386' 'MN975267' 'MN975268' 'MN938390' 'MN975263' 'MN938387' 'MN975265' 'MN938384' 'MN988669' 'MN988668' 'MN996527' 'MN996528' 'MN996529' 'MN996530' 'MN996531').
 seqs_from_USA := #('MN988713' 'MN997409' 'MN994467' 'MN994468' 'MN985325').
 seqs_from_Italy := #('MT008022' 'MT008023').
+seqs_from_Australia := #('MT007544')
 
-all_seqs := seqs_from_china , seqs_from_USA , seqs_from_Italy.
+all_seqs := seqs_from_china , seqs_from_USA , seqs_from_Italy , seqs_from_Australia.
 
 entrez_search := BioEntrezClient new nuccore
 			uids: seqs_from_china;
