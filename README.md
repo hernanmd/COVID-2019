@@ -1,6 +1,6 @@
-# nCoV-2019
+# Introduction
 
-Analysis of Coronavirus outbreak genomic data with Pharo
+Analysis of Coronavirus outbreak genomic data with Pharo 8.x
 
 # Installation
 
@@ -14,3 +14,12 @@ For visualization of cases evaluate in Pharo 8:
 	   repository: 'github://hernanmd/COVID-19';
 	   load.
 ```
+
+# Usage
+
+```smalltalk
+BioCOVID19Viz exampleLiveData
+```
+
+# Sample output
+
