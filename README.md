@@ -19,7 +19,28 @@ For visualization of cases as provied by CSSEGISandData, evaluate in Pharo 8:
 BioCOVID19Viz exampleLiveData
 ```
 
-For genomic analysis install [BioSmalltalk](https://github.com/hernanmd/BioSmalltalk) and load and evaluate the do_analysis.st script.
+For genomic analysis install [BioSmalltalk](https://github.com/hernanmd/BioSmalltalk) and evaluate the following one-liner to align the sequences with MAFFT:
+
+```smalltalk
+BioCOVID19GenomicAnalysis alignSeqs.
+```
+
+To add accession numbers as they appear in the NCBI GenBank repository, edit the methods matching the sequencing location:
+
+  - seqsFromChina
+  - seqsFromItaly
+  - seqsFromUSA
+  - ...
+
+The resulting alignment is written in 'mafft_output.align' in the Pharo image directory.
+
+Accessions are retrieved from https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Wuhan%20seafood%20market%20pneumonia%20virus,%20taxid:2697049
+
+# ToDo
+
+  - Download accessions from here: https://dev.ncbi.nlm.nih.gov/core/assets/genbank/files/ncov-sequences.yaml (currently restricted access?)
+  - Add sequences from GISAID
+  - Evaluate MAFFT alignment quality.
 
 # Sample output
 
