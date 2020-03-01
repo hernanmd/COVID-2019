@@ -36,6 +36,15 @@ BioCOVID19CasesAtDateTest >> testConfirmedCases [
 ]
 
 { #category : #test }
+BioCOVID19CasesAtDateTest >> testDate [
+
+	self assert: self cbd date isNil.
+	self cbd date: '01/01/2020' asDate.
+	self assert: (self cbd date isKindOf: Date).
+	self assert: self cbd date equals: '01/01/2020' asDate.
+]
+
+{ #category : #test }
 BioCOVID19CasesAtDateTest >> testDeathCases [
 
 	self assert: self cbd deathCases isNil.
