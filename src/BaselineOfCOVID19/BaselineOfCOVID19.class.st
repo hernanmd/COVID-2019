@@ -24,7 +24,7 @@ BaselineOfCOVID19 >> baseline: spec [
 BaselineOfCOVID19 >> projectSpecForDatasets: spec [
 
 	spec
-		baseline: 'PharoAI' 
+		baseline: 'Datasets' 
 		with: [ spec repository: 'github://PharoAI/Datasets' ].
 
 ]
