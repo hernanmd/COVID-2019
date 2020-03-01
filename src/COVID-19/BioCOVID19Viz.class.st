@@ -48,11 +48,17 @@ BioCOVID19Viz class >> exampleLocalData [
 
 { #category : #accessing }
 BioCOVID19Viz class >> install [
+	" Install manually dependencies "
 
 	Metacello new
 	   baseline: 'Datasets';
 	   repository: 'github://PharoAI/Datasets';
 	   load.
+	Metacello new
+	   baseline: 'Roassal2';
+	   repository: 'github://ObjectProfile/Roassal2';
+	   load.
+
 ]
 
 { #category : #visualization }
