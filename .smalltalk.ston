@@ -1,0 +1,10 @@
+SmalltalkCISpec {
+  #loading : [
+    SCIMetacelloLoadSpec {
+      #baseline : 'COVID19',
+      #directory : 'src',
+      #onWarningLog : true,
+      #platforms : [ #pharo ]
+    }
+  ]
+}
