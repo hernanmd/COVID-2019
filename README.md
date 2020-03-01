@@ -1,6 +1,6 @@
 # Introduction
 
-Analysis of Coronavirus outbreak genomic data with Pharo 8.x
+Analysis of Coronavirus outbreak data with Pharo 8.x
 
 # Installation
 
@@ -13,7 +13,7 @@ Metacello new
 
 # Usage
 
-For visualization of cases evaluate in Pharo 8:
+For visualization of cases as provied by CSSEGISandData, evaluate in Pharo 8:
 
 ```smalltalk
 BioCOVID19Viz exampleLiveData
