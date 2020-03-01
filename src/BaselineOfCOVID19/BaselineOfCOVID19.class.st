@@ -1,7 +1,7 @@
 Class {
 	#name : #BaselineOfCOVID19,
 	#superclass : #BaselineOf,
-	#category : #'BaselineOfCOVID-19'
+	#category : #BaselineOfCOVID19
 }
 
 { #category : #baselines }
