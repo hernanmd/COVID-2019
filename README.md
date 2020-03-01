@@ -1,6 +1,6 @@
 # Introduction
 
-Analysis of Coronavirus outbreak data with Pharo 8.x
+Analysis of Coronavirus outbreak data with [Pharo](https://www.pharo.org) 8.x
 
 # Installation
 
@@ -25,7 +25,7 @@ For genomic analysis install [BioSmalltalk](https://github.com/hernanmd/BioSmall
 BioCOVID19GenomicAnalysis alignSeqs.
 ```
 
-To add accession numbers as they appear in the NCBI GenBank repository, edit the methods matching the sequencing location:
+To add accession numbers as they appear in the NCBI GenBank repository, edit the class side methods matching the sequencing location:
 
   - seqsFromChina
   - seqsFromItaly
@@ -35,6 +35,8 @@ To add accession numbers as they appear in the NCBI GenBank repository, edit the
 The resulting alignment is written in 'mafft_output.align' in the Pharo image directory.
 
 Accessions are retrieved from https://www.ncbi.nlm.nih.gov/labs/virus/vssi/#/virus?SeqType_s=Nucleotide&VirusLineage_ss=Wuhan%20seafood%20market%20pneumonia%20virus,%20taxid:2697049
+
+To create a GitHub Pharo project with Continuous Integration support from scrath follow [this video](https://www.youtube.com/watch?v=Wnt3OBhR18I).
 
 # ToDo
 
