@@ -1,7 +1,7 @@
 Class {
 	#name : #BaselineOfCOVID19,
 	#superclass : #BaselineOf,
-	#category : #'BaselineOfCOVID-19'
+	#category : #BaselineOfCOVID19
 }
 
 { #category : #baselines }
@@ -24,7 +24,7 @@ BaselineOfCOVID19 >> baseline: spec [
 BaselineOfCOVID19 >> projectSpecForDatasets: spec [
 
 	spec
-		baseline: 'PharoAI' 
+		baseline: 'Datasets' 
 		with: [ spec repository: 'github://PharoAI/Datasets' ].
 
 ]
