@@ -2,13 +2,12 @@ SmalltalkCISpec {
   #loading : [
     SCIMetacelloLoadSpec {
       #baseline : 'COVID19',
-
       #directory : 'src',
       #onWarningLog : true,
       #platforms : [ #pharo ]
     }
   ],
   #testing : {
-    #packages : [ 'COVID19*' ]
+    #packages : [ 'COVID-19*' ]
     }  
 }
