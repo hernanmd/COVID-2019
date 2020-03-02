@@ -15,10 +15,8 @@ BaselineOfCOVID19 >> baseline: spec [
 		self projectSpecForDatasets: spec.
 		
 		spec 
-			package: 'COVID-19'
-			with: [ spec requires: #('Roassal2' 'Datasets');
-			package: 'COVID-19-Tests'
-			with: [ spec requires: #('COVID-19') ] ]
+			package: 'COVID-19' with: [ spec requires: #('Roassal2' 'Datasets') ];
+			package: 'COVID-19-Tests' with: [ spec requires: #('COVID-19') ]
 	]
 ]
 
