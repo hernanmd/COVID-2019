@@ -1,3 +1,7 @@
+"
+BioCOVID19GenomicAnalysis alignSeqs.
+
+"
 Class {
 	#name : #BioCOVID19GenomicAnalysis,
 	#superclass : #Object,
@@ -6,58 +10,146 @@ Class {
 
 { #category : #alignment }
 BioCOVID19GenomicAnalysis class >> alignSeqs [
+	" Align the COVID-19 sequences "
 
-	| all_seqs entrez_search multi_fasta complete_genomes |
+	self alignSeqs: (self fetchSeqs: self collectSeqs)
+]
 
-	" The NCBI FTP directory is 0:/genomes/genbank/viral/Wuhan_seafood_market_pneumonia_virus/"
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> alignSeqs: aBioESearchResult [
 
-	all_seqs := ((self class organization listAtCategoryNamed: #accessions) 
-		collect: [ : sel | self perform: sel ])
-			joinUsing: Array empty.
-
-	self fetchSeqs: all_seqs.
+	self alignWithMAFFT: (self parseSeqs: aBioESearchResult).
 
 ]
 
 { #category : #alignment }
-BioCOVID19GenomicAnalysis class >> alignWithMAFFT: complete_genomes [
+BioCOVID19GenomicAnalysis class >> alignWithAGA: aBioFastaMultiRecord [
+	" Aligh with AGA "
+
+	(Smalltalk at: #BioAGAWrapper) new 
+		inGenBankRef: nil;
+		inFastaQuery: aBioFastaMultiRecord;
+		outFastaAlign: self outputAGAFilename;
+		execute.
+
+]
+
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> alignWithMAFFT: aBioFastaMultiRecord [
 
 	" Aligh with MAFFT "
 	(Smalltalk at: #BioMAFFTWrapper) new 
 		auto;
 		maxiterate: 1000;
-		input: complete_genomes;
-		addOutputParameter: 'mafft_output.align';
+		input: aBioFastaMultiRecord;
+		addOutputParameter: self outputMAFFTFilename;
 		execute.
+
+]
+
+{ #category : #accessing }
+BioCOVID19GenomicAnalysis class >> buildReportFromMultiFasta: multi_fasta [
+
+	self outputReportFilename asFileReference writeStreamDo: [ : writeStream | 
+		writeStream 
+			nextPutAll: 'Available genomes so far: ', multi_fasta size asString; 
+			lf;
+			nextPutAll: 	'Any gaps in the sequenced genomes? ' , multi_fasta hasGaps asString ].
+	self inform: 'Written output report: ' , self outputReportFilename.
+
+		
+		
+]
+
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> collectSeqs [
+	" Answer a <Collection> of <String> each one representing a COVID-19 accession number "
+
+	^ (((self class organization listAtCategoryNamed: #accessions) 
+			collect: [ : sel | self perform: sel ])
+				joinUsing: Array empty)
+					asSet.
 
 ]
 
 { #category : #alignment }
 BioCOVID19GenomicAnalysis class >> fetchSeqs: allSeqs [
 
-	| entrez_search multi_fasta complete_genomes |
-
-	entrez_search := (Smalltalk at: #BioEntrezClient) new nuccore
+	^ (Smalltalk at: #BioEntrezClient) new nuccore
 			uids: allSeqs;
 			setFasta;
 			setModeText;
 			fetch.
-	multi_fasta := (Smalltalk at: #BioParser) parseMultiFasta: entrez_search result. 
-	" Genomes so far "
-	multi_fasta size.
-	" GC-content percentage of each Genome "
-	multi_fasta gcContent.
-	" Occurrences of nucleotides "
-	multi_fasta occurrencesOfLetters.
+
+
+]
+
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> inspectMultiFasta: multi_fasta [
+
+	multi_fasta gcContent inspectWithLabel: 'GC-content percentage of each sequence '.
+	multi_fasta gcSkew inspectWithLabel: 'GC-skew index of each sequence '.	
+	multi_fasta occurrencesOfLetters inspectWithLabel: 'Occurrences of nucleotides '.
+]
+
+{ #category : #accessing }
+BioCOVID19GenomicAnalysis class >> outputAGAFilename [
+	" Answer a <String> representing the output file name "
+
+	^ String streamContents: [ : stream |
+		stream
+			nextPutAll: 'COVID-19-AGA-';
+			nextPutAll: (DateAndTime current printYMDHMSeparatedBy: $_);
+			nextPutAll: '.aln'
+		 ]
+]
+
+{ #category : #accessing }
+BioCOVID19GenomicAnalysis class >> outputMAFFTFilename [
+	" Answer a <String> representing the output file name "
+
+	^ String streamContents: [ : stream |
+		stream
+			nextPutAll: 'COVID-19-MAFFT-';
+			nextPutAll: (DateAndTime current printYMDHMSeparatedBy: $_);
+			nextPutAll: '.aln'
+		 ]
+]
+
+{ #category : #accessing }
+BioCOVID19GenomicAnalysis class >> outputReportFilename [
+	" Answer a <String> representing the output file name "
+
+	^ String streamContents: [ : stream |
+		stream
+			nextPutAll: 'COVID-19-report-';
+			nextPutAll: (DateAndTime current printYMDHMSeparatedBy: $_);
+			nextPutAll: '.txt'
+		 ]
+]
+
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> parseSeqs: aBioEntrezObject [
+
+	| multi_fasta complete_genomes |
+
+	multi_fasta := (Smalltalk at: #BioParser) parseMultiFasta: aBioEntrezObject result. 
+	self buildReportFromMultiFasta: multi_fasta.
+
 	" Select only complete genomes "
 	complete_genomes := multi_fasta select: [ : f | f name endsWith: 'complete genome' ].
 	" Group by sequence length "
-	complete_genomes groupedBySeqLength.
-	" Any gaps in the sequenced genomes? "
-	complete_genomes hasGaps.
+	complete_genomes groupedBySeqLength inspectWithLabel: 'Complete genomes grouped by sequence length'.
+	
+	^ complete_genomes.
 
-	self alignWithMAFFT: complete_genomes.
+]
 
+{ #category : #alignment }
+BioCOVID19GenomicAnalysis class >> runAlignment [
+	<example>
+
+	^ self alignSeqs 
 ]
 
 { #category : #accessions }
@@ -161,6 +253,6 @@ BioCOVID19GenomicAnalysis class >> seqsFromThailand [
 { #category : #accessions }
 BioCOVID19GenomicAnalysis class >> seqsFromUSA [
 
-	^ #('MN988713' 'MN997409' 'MN994467' 'MN994468' 'MN985325' 'MT039887' 'MT039888' 'MT027062' 'MT027063' 'MT027064' 'MT020880' 'MT020881' 'MN988713' 'MN994468' 'MT106054' 'MT106052' 'MT106053' 'MT118835').
+	^ #('MN988713' 'MN997409' 'MN994467' 'MN985325' 'MT039887' 'MT039888' 'MT027062' 'MT027063' 'MT027064' 'MT020880' 'MT020881' 'MN994468' 'MT106054' 'MT106052' 'MT106053' 'MT118835').
 
 ]
