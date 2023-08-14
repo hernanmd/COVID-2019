@@ -15,7 +15,7 @@ BaselineOfCOVID19 >> baseline: spec [
 		self projectSpecForDatasets: spec.
 		
 		spec 
-			package: 'COVID-19' with: [ spec requires: #('Roassal2' 'Datasets') ];
+			package: 'COVID-19' with: [ spec requires: #('Roassal2' 'AIDatasets') ];
 			package: 'COVID-19-Tests' with: [ spec requires: #('COVID-19') ]
 	]
 ]
@@ -24,8 +24,8 @@ BaselineOfCOVID19 >> baseline: spec [
 BaselineOfCOVID19 >> projectSpecForDatasets: spec [
 
 	spec
-		baseline: 'Datasets' 
-		with: [ spec repository: 'github://PharoAI/Datasets' ].
+		baseline: 'AIDatasets' 
+		with: [ spec repository: 'github://pharo-ai/datasets/src' ].
 
 ]
 

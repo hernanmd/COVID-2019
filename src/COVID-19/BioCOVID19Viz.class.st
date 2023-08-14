@@ -46,21 +46,6 @@ BioCOVID19Viz class >> exampleLocalData [
 		build
 ]
 
-{ #category : #accessing }
-BioCOVID19Viz class >> install [
-	" Install manually dependencies "
-
-	Metacello new
-	   baseline: 'Datasets';
-	   repository: 'github://PharoAI/Datasets';
-	   load.
-	Metacello new
-	   baseline: 'Roassal2';
-	   repository: 'github://ObjectProfile/Roassal2';
-	   load.
-
-]
-
 { #category : #visualization }
 BioCOVID19Viz >> build [
 
@@ -78,9 +63,60 @@ BioCOVID19Viz >> build [
 			buildDataSetFor: (self perform: assoc key) 
 			setterSelector: assoc value asMutator) ].
 	self 
-		buildGrapherFor: allCases
+		buildChartFor: allCases
 		type: caseAccessors values
 	
+]
+
+{ #category : #visualization }
+BioCOVID19Viz >> buildChartFor: arrayOfCases type: caseTypeSelectors [
+
+	| chart minDate lb latestStats popUp |
+	
+	minDate := (arrayOfCases anyOne detectMin: #date) date.
+	chart := RSCompositeChart new.
+		
+	arrayOfCases with: caseTypeSelectors do: [ : caseTypeArray : caseTypeSelector |
+		| line |
+
+		popUp := (RSPopup text: [ : assoc | (caseTypeArray perform: caseTypeSelector) asString ]).
+		line := RSLinePlot new.
+		line 
+			addInteraction: popUp;
+			x: (caseTypeArray collect: [ : aCase | aCase date julianDayNumber - minDate julianDayNumber ])
+			y: (caseTypeArray collect: [ : aCase | aCase perform: caseTypeSelector ]).
+
+		chart add: line ].
+
+	chart horizontalTick fontSize: 4.
+	chart horizontalTick 
+		numberOfTicks: 10;	
+		fromNames: (arrayOfCases anyOne collect: #date);
+		useDiagonalLabel.
+	chart verticalTick integerWithCommas.
+	chart 
+		title: 'Cases of COVID-19';
+		ylabel: 'Count';
+		xlabel: 'Day';
+		extent: 400 @ 200.
+		
+	latestStats := arrayOfCases anyOne last.
+		
+	lb := RSLegend new.
+	lb container: chart canvas.
+	{ 
+		'Deaths: ' -> #deathCases .
+		'Confirmed: ' -> #confirmedCases.
+		'Recovered: ' -> #recoveredCases } doWithIndex: [ :lblAssoc :index |
+		lb 
+			text: lblAssoc key , (latestStats perform: lblAssoc value) asString
+			withBoxColor: (chart plots at: index) computeColor ].
+	lb location right; middle; offset: 100 @ 100.
+	lb build.
+	
+	chart open
+
+
 ]
 
 { #category : #visualization }
@@ -101,65 +137,16 @@ BioCOVID19Viz >> buildDataSetFor: table setterSelector: setterSelector [
 ]
 
 { #category : #visualization }
-BioCOVID19Viz >> buildGrapherFor: arrayOfCases type: caseTypeSelectors [
-
-	| ds grapher minDate lb latestStats |
-	
-	minDate := (arrayOfCases anyOne detectMin: #date) date.
-	grapher := RTGrapher new.
-	arrayOfCases with: caseTypeSelectors do: [ : caseTypeArray : caseTypeSelector |
-		| lineColor |
-		ds := RTData new.
-		ds interaction popup.
-		lineColor := self colorFor: caseTypeSelector.
-		ds 	dotShape color: lineColor.
-		ds 
-			points: caseTypeArray;
-			connectColor: lineColor;
-			x: [ : aCase | aCase date julianDayNumber - minDate julianDayNumber ];
-			y: caseTypeSelector.
-		grapher 
-			add: ds ].
-	grapher axisY
-		title: 'Count';
-		color: Color black;		
-		noDecimal.
-	grapher axisX 
-		title: 'Day';
-		color: Color black;		
-		numberOfTicks: arrayOfCases anyOne size;
-		numberOfLabels: arrayOfCases anyOne size / 2;
-		labelRotation: -30;
-		labelConversion: [ :v | Date julianDayNumber: v + minDate julianDayNumber ].
-	grapher 
-		extent: 400@200;
-		build.
-		
-	lb := RTLegendBuilder new.
-	lb view: grapher view;
-		top.
-	lb addColoredText: 'Cases of COVID-19' color: Color black.
-	latestStats := arrayOfCases anyOne last.
-	lb addColoredText: 'Deaths: ' ,  latestStats deathCases asString color: Color red;
-		addColoredText: 'Confirmed: ' , latestStats confirmedCases asString color: Color blue;
-		addColoredText: 'Recovered: ',  latestStats recoveredCases asString color: Color green.
-	lb build.
-	grapher view @ RTZoomableView @ RTZoomableBoxView.
-	
-	grapher view inspect.
-
-
-]
-
-{ #category : #visualization }
 BioCOVID19Viz >> buildTableFor: urlString [
 
-	| dataLocation |
-	dataLocation := self useLocalData
+	| fileRef |
+	fileRef := self useLocalData
 		ifTrue: [ urlString asFileReference ]
-		ifFalse: [ (ZnEasy get: urlString) contents ].
+		ifFalse: [ 
+			self downloadResourcesFrom: urlString.
+			FileSystem disk workingDirectory / urlString asZnUrl pathSegments last ].
 	^ DataFrame 
-			readFromCsv: dataLocation readStream contents 
+			readFromCsv: fileRef readStream contents 
 			withSeparator: $,
 	
 ]
@@ -238,25 +225,31 @@ BioCOVID19Viz >> recoveredCasesTable: anObject [
 { #category : #constants }
 BioCOVID19Viz >> urlForConfirmedCases [
 
-	^ self useLocalData 
-		ifFalse: [ 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv' ]
-		ifTrue: [ 'time_series_19-covid-Confirmed.csv' ].
+	^ self useLocalData
+		  ifFalse: [ self urlStringForConfirmedCases ]
+		  ifTrue: [ 'time_series_covid19_confirmed_global.csv' ]
 ]
 
 { #category : #constants }
 BioCOVID19Viz >> urlForDeathCases [
 
 	^ self useLocalData 
-		ifFalse: [ 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv' ]
-		ifTrue: [ 'time_series_19-covid-Deaths.csv' ].
+		ifFalse: [ 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv' ]
+		ifTrue: [ 'time_series_covid19_deaths_global.csv' ].
 ]
 
 { #category : #constants }
 BioCOVID19Viz >> urlForRecoveredCases [
 
 	^ self useLocalData 
-		ifFalse: [ 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Recovered.csv' ]
-		ifTrue: [ 'time_series_19-covid-Recovered.csv' ].
+		ifFalse: [ 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv' ]
+		ifTrue: [ 'time_series_covid19_recovered_global.csv' ].
+]
+
+{ #category : #constants }
+BioCOVID19Viz >> urlStringForConfirmedCases [
+
+	^ 'https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv'
 ]
 
 { #category : #accessing }
