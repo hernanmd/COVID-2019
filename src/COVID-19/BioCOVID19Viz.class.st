@@ -71,11 +71,12 @@ BioCOVID19Viz >> build [
 { #category : #visualization }
 BioCOVID19Viz >> buildChartFor: arrayOfCases type: caseTypeSelectors [
 
-	| chart minDate lb latestStats popUp |
+	| chart minDate lb latestStats popUp dates |
 	
+
 	minDate := (arrayOfCases anyOne detectMin: #date) date.
 	chart := RSCompositeChart new.
-		
+
 	arrayOfCases with: caseTypeSelectors do: [ : caseTypeArray : caseTypeSelector |
 		| line |
 
@@ -88,12 +89,20 @@ BioCOVID19Viz >> buildChartFor: arrayOfCases type: caseTypeSelectors [
 
 		chart add: line ].
 
+	dates := arrayOfCases anyOne collect: [ : case | case date ].
+
 	chart horizontalTick fontSize: 4.
 	chart horizontalTick 
-		numberOfTicks: 10;	
-		fromNames: (arrayOfCases anyOne collect: #date);
+		"fromNames: dates keys;"
+		doNotUseNiceLabel;
+		numberOfTicks: 20;
+		labelConversion: [ : each | each isZero 
+				ifFalse: [ dates at: each asInteger ] 
+				ifTrue: [ dates first ] ];
 		useDiagonalLabel.
+
 	chart verticalTick integerWithCommas.
+	chart chartExtents	minValueY: 0.
 	chart 
 		title: 'Cases of COVID-19';
 		ylabel: 'Count';
@@ -101,7 +110,8 @@ BioCOVID19Viz >> buildChartFor: arrayOfCases type: caseTypeSelectors [
 		extent: 400 @ 200.
 		
 	latestStats := arrayOfCases anyOne last.
-		
+	chart build.
+	
 	lb := RSLegend new.
 	lb container: chart canvas.
 	{ 
@@ -111,10 +121,10 @@ BioCOVID19Viz >> buildChartFor: arrayOfCases type: caseTypeSelectors [
 		lb 
 			text: lblAssoc key , (latestStats perform: lblAssoc value) asString
 			withBoxColor: (chart plots at: index) computeColor ].
-	lb location right; middle; offset: 100 @ 100.
+	lb location outer; innerY; top; right; offset: 30 @ 0.
 	lb build.
 	
-	chart open
+	chart canvas open
 
 
 ]
